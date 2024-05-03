@@ -86,7 +86,7 @@ const App = () => {
   return (
     <Container>
       <Typography variant="h4" align="center" mt={3} mb={3}>
-        In2Scope
+        Eduscope
       </Typography>
       <Paper square>
         <Tabs

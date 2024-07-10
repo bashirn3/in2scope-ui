@@ -1,87 +1,52 @@
 import React, { useState } from "react";
-import { Tabs, Tab, Container, Paper, Typography } from "@mui/material";
-
-import { School, FilterList, List, Map as MapIcon } from "@mui/icons-material";
+import { CSVLink } from "react-csv";
+import {
+  Tabs,
+  Tab,
+  Container,
+  Paper,
+  Typography,
+  Button,
+  Grid,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import {
+  School,
+  List,
+  Map as MapIcon,
+  DownloadSharp,
+} from "@mui/icons-material";
 import Map from "./components/Map/map";
 import { Controller } from "./components/controller";
 import DataTable from "./components/data-table";
 
 const columns = [
-
-  {
-    field: "borough",
-    headerName: "Borough",
-    flex: 1,
-  },
-
-  {
-    field: "schoolname", headerName: "School Name", flex:1
-  },
-
-  {
-    field: "travel_time",
-    headerName: "Travel time (In Minutes)",
-    flex: 1,
-  
-  },
-  
-  {
-    field: "address",
-    headerName: "Address",
-    flex: 1,
-  },
- 
-
+  { field: "borough", headerName: "Borough", flex: 1 },
+  { field: "schoolname", headerName: "School Name", flex: 1 },
+  { field: "travel_time", headerName: "Travel time (In Minutes)", flex: 1 },
+  { field: "address", headerName: "Address", flex: 1 },
   { field: "postcode", headerName: "Post Code", flex: 1 },
-];
-
-const data = [
-  {
-    id: 1,
-    borough: "Westminster",
-    name: "John Doe School",
-    postcode: "W1A 1AA",
-  },
-  {
-    id: 2,
-    borough: "Kensington and Chelsea",
-    name: "Jane Smith School",
-    postcode: "SW1A 2AA",
-  },
-  {
-    id: 3,
-    borough: "Camden",
-    name: "Michael Johnson School",
-    postcode: "NW1 1AA",
-  },
-  {
-    id: 4,
-    borough: "Islington",
-    name: "Sarah Wilson School",
-    postcode: "N1 1AA",
-  },
-  {
-    id: 5,
-    borough: "Tower Hamlets",
-    name: "David Taylor School",
-    postcode: "E1 0AA",
-  },
 ];
 
 const App = () => {
   const [tabValue, setTabValue] = useState(0);
+  const [subTabValue, setSubTabValue] = useState(0);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleChangeTab = (event, newValue) => {
     setTabValue(newValue);
   };
 
-  const [subTabValue, setSubTabValue] = useState(0);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-
   const handleChangeSubTab = (event, newValue) => {
     setSubTabValue(newValue);
   };
+
+  const dataToDownload = cleanData(data);
 
   return (
     <Container>
@@ -94,9 +59,11 @@ const App = () => {
           onChange={handleChangeTab}
           indicatorColor="primary"
           textColor="primary"
+          variant={isSmallScreen ? "scrollable" : "fullWidth"}
+          scrollButtons={isSmallScreen ? "auto" : "off"}
         >
           <Tab label="School Checker" icon={<School />} />
-          {/* <Tab label="Data Filter" icon={<FilterList />}  /> */}
+          {/* Add more tabs here if needed */}
         </Tabs>
       </Paper>
       {tabValue === 0 && (
@@ -105,17 +72,18 @@ const App = () => {
             setData={setData}
             loading={loading}
             setLoading={setLoading}
+            isSmallScreen={isSmallScreen}
           />
-
-          <Paper square style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "0 10px 0 0"
-
-
-          }}>
-
+          <Paper
+            square
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "0 10px 0 0",
+              flexDirection: isSmallScreen ? "column" : "row",
+            }}
+          >
             <Tabs
               value={subTabValue}
               onChange={handleChangeSubTab}
@@ -125,23 +93,45 @@ const App = () => {
               <Tab label="Map View" icon={<MapIcon />} />
               <Tab label="List View" icon={<List />} />
             </Tabs>
-            <Typography variant="h6" color="primary">
-              {data.length} schools found
-            </Typography>
+            <Grid
+              container
+              spacing={2}
+              alignItems="center"
+              style={{ width: isSmallScreen ? "100%" : "auto", margin: 0 }}
+            >
+              <div style={{display: "flex", justifyContent: "center", margin: "10px", width:"100%"}}>
+                <Typography
+                  variant={isSmallScreen ? "caption" : "h6"}
+                  color="primary"
+                  align={isSmallScreen ? "left" : "left"}
+                >
+                  {data.length} school(s) found
+                </Typography>
+              </div>
+              {data?.length > 0 && (
+                <div style={{ marginBottom: "20px", display: "flex", justifyContent: "center", width: "100%" }}>
+                  <CSVLink data={dataToDownload} filename={"schools-data.xlsx"}>
+                    <Button
+                      variant="contained"
+                      endIcon={<DownloadSharp />}
+                      disabled={data?.length === 0}
+                      fullWidth={isSmallScreen}
+                    >
+                      Export
+                    </Button>
+                  </CSVLink>
+                </div>
+              )}
+            </Grid>
           </Paper>
           {subTabValue === 0 && <Map data={data} />}
-
           {subTabValue === 1 && (
-            <div>
-              {/* List View */}
-              <DataTable columns={columns} data={data} getRowId={(row)=> row.id} />
-            </div>
+            <DataTable
+              columns={columns}
+              data={data}
+              getRowId={(row) => row.id}
+            />
           )}
-        </div>
-      )}
-      {tabValue === 1 && (
-        <div>
-          <Controller filterView />
         </div>
       )}
     </Container>
@@ -149,3 +139,10 @@ const App = () => {
 };
 
 export default App;
+
+function cleanData(data) {
+  return data.map((obj) => {
+    const { id, latitude, longitude, ...rest } = obj;
+    return rest;
+  });
+}

@@ -1,95 +1,132 @@
-import { useState } from "react";
-import axios  from "axios";
+import React, { useState } from "react";
+import axios from "axios";
 import {
   Paper,
   Typography,
   Grid,
   TextField,
-//   OutlinedInput,
   FormControl,
   RadioGroup,
   FormControlLabel,
   Radio,
   Button,
-} from "@mui/material";
+  MenuItem,
 
+} from "@mui/material";
 import { Search, UploadFile } from "@mui/icons-material";
 
+const boroughs = [
+  "Barking and Dagenham", "Barnet", "Bexley", "Brent", "Bromley",
+  "Camden", "Croydon", "Ealing", "Enfield", "Greenwich", "Hackney",
+  "Hammersmith and Fulham", "Haringey", "Harrow", "Havering",
+  "Hillingdon", "Hounslow", "Islington", "Kensington and Chelsea",
+  "Kingston upon Thames", "Lambeth", "Lewisham", "Merton", "Newham",
+  "Redbridge", "Richmond upon Thames", "Southwark", "Sutton",
+  "Tower Hamlets", "Waltham Forest", "Wandsworth", "Westminster",
+];
+
 export const Controller = (props) => {
-  const { filterView, setData, loading, setLoading } = props;
+  const { filterView, setData, loading, setLoading, isSmallScreen } = props;
 
-const [postCode, setPostCode] = useState('');
-const [maxTravelTime, setMaxTravelTime] = useState('');
-const [modeOfTransport, setModeOfTransport] = useState('driving'); // Default value
+  const [postCode, setPostCode] = useState("");
+  const [maxTravelTime, setMaxTravelTime] = useState("");
+  const [modeOfTransport, setModeOfTransport] = useState("driving");
+  const [selectedBorough, setSelectedBorough] = useState("");
 
+  const handlePostCodeChange = (event) => setPostCode(event.target.value);
+  const handleMaxTravelTimeChange = (event) => setMaxTravelTime(event.target.value);
+  const handleModeOfTransportChange = (event) => setModeOfTransport(event.target.value);
+  const handleBoroughChange = (event) => setSelectedBorough(event.target.value);
 
-const handlePostCodeChange = (event) => setPostCode(event.target.value);
-const handleMaxTravelTimeChange = (event) => setMaxTravelTime(event.target.value);
-const handleModeOfTransportChange = (event) => setModeOfTransport(event.target.value);
+  const isValidForm = postCode.trim() !== "" && maxTravelTime.trim() !== "";
 
-const isValidForm = postCode.trim() !== '' && maxTravelTime.trim() !== '';
-
-const handleSubmit = async () => {
+  const handleSubmit = async () => {
     if (isValidForm) {
-      // Construct the payload
-
       try {
         setLoading(true);
-  
-        // Specify the data to be sent in the request body
         const requestData = {
           max_travel_time: maxTravelTime,
-          postcode:postCode,
-          mode_of_transport: modeOfTransport
+          postcode: postCode,
+          mode_of_transport: modeOfTransport,
         };
-  
-        // Send a POST request to the specified URL
-        const response = await axios.post('https://in2scope-api.onrender.com/find_schools', requestData);
-  
-        // Update state with the returned data
+
+        const response = await axios.post(
+          `http://52.44.225.107:3999/find_schools?borough=${selectedBorough}`,
+          
+          requestData
+        );
+
         setData(response.data.schools);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
-  
-      // Call your API here, passing formData
-      // Example: apiService.submitFormData(formData);
     } else {
-      // Handle form validation error
-      alert('Please fill in all required fields.');
+      alert("Please fill in all required fields.");
     }
   };
-
-
-
-
-
-
-
-
 
   return (
     <Paper elevation={3} style={{ padding: "20px", margin: "20px 0" }}>
       <Grid container spacing={2}>
         {filterView && (
           <Grid item xs={12}>
-            <Button variant="contained" startIcon={<UploadFile />} loading={loading}>
+            <Button
+              variant="contained"
+              startIcon={<UploadFile />}
+              loading={loading}
+              fullWidth
+            >
               Upload File
             </Button>
           </Grid>
         )}
 
-        <Grid item xs={6}>
-          <TextField label="Post Code" fullWidth onChange={handlePostCodeChange} value={postCode} required/>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            value={selectedBorough}
+            label="Borough"
+            onChange={handleBoroughChange}
+            fullWidth
+            select
+          >
+            {boroughs.map((borough) => (
+              <MenuItem key={borough} value={borough}>
+                {borough}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
-        <Grid item xs={6}>
-          <TextField  label="Max Travel Time"  type="number"fullWidth onChange={handleMaxTravelTimeChange} value={maxTravelTime} required/>
+
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Max Travel Time"
+            type="number"
+            fullWidth
+            onChange={handleMaxTravelTimeChange}
+            value={maxTravelTime}
+            required
+          />
         </Grid>
+
+
+        {selectedBorough !== "" && (
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Post Code"
+              fullWidth
+              onChange={handlePostCodeChange}
+              value={postCode}
+              required
+            />
+          </Grid>
+        )}
+
+
         <Grid item xs={12}>
           <Typography variant="subtitle1">Mode of Transport</Typography>
-          <FormControl component="fieldset">
+          <FormControl component="fieldset" fullWidth>
             <RadioGroup
               row
               aria-label="mode"
@@ -101,19 +138,34 @@ const handleSubmit = async () => {
               <FormControlLabel
                 value="bicycling"
                 control={<Radio />}
-                label="Cycling"
+                label={<Typography variant="caption">
+                Cycling
+              </Typography>}
               />
               <FormControlLabel
                 value="transit"
                 control={<Radio />}
-                label="Public Transport"
+                label={<Typography variant="caption">
+                Public Transport 
+              </Typography>}
               />
-              <FormControlLabel value="driving" control={<Radio />} label="Car" />
+              <FormControlLabel
+                value="driving"
+                control={<Radio />}
+                label={<Typography variant="caption">
+                  Car
+                </Typography>}
+              />
             </RadioGroup>
           </FormControl>
         </Grid>
         <Grid item xs={12}>
-          <Button variant="contained" startIcon={<Search />} onClick={handleSubmit}>
+          <Button
+            variant="contained"
+            startIcon={<Search />}
+            onClick={handleSubmit}
+            fullWidth={isSmallScreen}
+          >
             {loading ? "Fetching..." : "Scope"}
           </Button>
         </Grid>

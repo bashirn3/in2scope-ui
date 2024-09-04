@@ -9,7 +9,7 @@ const ContactInfo = ({ id }) => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await axios.get(`http://52.44.225.107:3999/find_schools/${id}`);
+        const response = await axios.get(`https://in2scope-api.onrender.com/find_schools/${id}`);
         setContacts(response.data.contacts);
       } catch (error) {
         console.error("Error fetching contacts:", error);

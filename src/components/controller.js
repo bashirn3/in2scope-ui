@@ -51,7 +51,7 @@ export const Controller = (props) => {
         };
 
         const response = await axios.post(
-          `http://52.44.225.107:3999/find_schools?borough=${selectedBorough}`,
+          `https://in2scope-api.onrender.com/find_schools?borough=${selectedBorough}`,
           
           requestData
         );
@@ -101,7 +101,7 @@ export const Controller = (props) => {
 
         <Grid item xs={12} sm={6}>
           <TextField
-            label="Max Travel Time"
+            label="Max Travel Time(In Minutes)"
             type="number"
             fullWidth
             onChange={handleMaxTravelTimeChange}

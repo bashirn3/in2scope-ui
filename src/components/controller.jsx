@@ -14,6 +14,7 @@ import {
 
 } from "@mui/material";
 import { Search, UploadFile } from "@mui/icons-material";
+import { baseApi } from "../api/base-api";
 
 const boroughs = [
   "Barking and Dagenham", "Barnet", "Bexley", "Brent", "Bromley",
@@ -51,7 +52,7 @@ export const Controller = (props) => {
         };
 
         const response = await axios.post(
-          `https://in2scope-api.onrender.com/find_schools?borough=${selectedBorough}`,
+          `${baseApi}/find_schools?borough=${selectedBorough}`,
           
           requestData
         );
@@ -133,7 +134,7 @@ export const Controller = (props) => {
               name="mode"
               defaultValue={modeOfTransport}
               onChange={handleModeOfTransportChange}
-              required
+              required 
             >
               <FormControlLabel
                 value="bicycling"

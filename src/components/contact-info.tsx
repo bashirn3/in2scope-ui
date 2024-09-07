@@ -1,25 +1,18 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import Skeleton from "@mui/material/Skeleton";
+import { baseApi } from "../api/base-api";
+import { useFetchResource }from "../hooks/useFetchResource";
 
-const ContactInfo = ({ id }) => {
-  const [contacts, setContacts] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchContacts = async () => {
-      try {
-        const response = await axios.get(`https://in2scope-api.onrender.com/find_schools/${id}`);
-        setContacts(response.data.contacts);
-      } catch (error) {
-        console.error("Error fetching contacts:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+type ContactInfoProps = {
+  id: string;
+}
 
-    fetchContacts();
-  }, [id]);
+const ContactInfo = ({ id }: ContactInfoProps) => {
+  
+  const {resource: contacts, loading} = useFetchResource(`${baseApi}/find_schools/${id}`)
+
+  
 
   if (loading) {
     return (

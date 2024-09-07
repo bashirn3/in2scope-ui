@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import schoolIcon from "../../assets/icons8-school-50.png";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -39,7 +38,7 @@ const Map = ({ data }) => {
               })
             }
           >
-            {/* <a target="_blank" href="https://icons8.com/icon/111460/graduation-cap">School</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a> */}
+
             <Popup>
               <div style={{
                 maxHeight: "500px",
@@ -47,7 +46,7 @@ const Map = ({ data }) => {
               }}>
                 <p>{school.schoolname}</p>
                 <p> Travel time: {school.travel_time} minutes</p>
-                <a href={school.website} target="_blank">
+                <a href={school.website} target="_blank" rel="noreferrer">
                   Click to go to the school's website
                 </a>
                 <div

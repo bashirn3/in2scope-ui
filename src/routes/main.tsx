@@ -17,11 +17,13 @@ import {
   Map as MapIcon,
   DownloadSharp,
 } from "@mui/icons-material";
-import Map from "./components/Map/map";
-import { Controller } from "./components/controller";
-import DataTable from "./components/data-table";
+import Map from "../components/Map/map";
+import { Controller } from "../components/controller";
+import DataTable from "../components/data-table";
 
-const columns = [
+type TableColumns = {field: string, headerName: string, flex?: number}[]
+
+const columns : TableColumns = [
   { field: "borough", headerName: "Borough", flex: 1 },
   { field: "schoolname", headerName: "School Name", flex: 1 },
   { field: "travel_time", headerName: "Travel time (In Minutes)", flex: 1 },
@@ -29,20 +31,20 @@ const columns = [
   { field: "postcode", headerName: "Post Code", flex: 1 },
 ];
 
-const App = () => {
-  const [tabValue, setTabValue] = useState(0);
-  const [subTabValue, setSubTabValue] = useState(0);
+const Main = () => {
+  const [tabValue, setTabValue] = useState<number>(0);
+  const [subTabValue, setSubTabValue] = useState<number>(0);
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleChangeTab = (event, newValue) => {
+  const handleChangeTab = (event, newValue): void => {
     setTabValue(newValue);
   };
 
-  const handleChangeSubTab = (event, newValue) => {
+  const handleChangeSubTab = (event, newValue): void => {
     setSubTabValue(newValue);
   };
 
@@ -60,7 +62,7 @@ const App = () => {
           indicatorColor="primary"
           textColor="primary"
           variant={isSmallScreen ? "scrollable" : "fullWidth"}
-          scrollButtons={isSmallScreen ? "auto" : "off"}
+          scrollButtons={isSmallScreen ? "auto" : "off" as any}
         >
           <Tab label="School Checker" icon={<School />} />
           {/* Add more tabs here if needed */}
@@ -138,7 +140,7 @@ const App = () => {
   );
 };
 
-export default App;
+export default Main;
 
 function cleanData(data) {
   return data.map((obj) => {
